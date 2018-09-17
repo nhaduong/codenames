@@ -1,0 +1,14 @@
+name: test6
+Giver embedding: data/googlenews_SLIM.txt, Guesser embedding: data/glove.6B.300d.word2vec.txt
+runtime: 2:46:24.001520
+time finished: 2018-08-23 17:04:47.019332
+# of games played: 89
+# of games won (by team1) = 51
+% of Team 2: Winner: 0.31
+% of Assassin word guessed: 0.34
+% of Team 1: Winner: 0.33
+% of All clues given were illegal.: 0.02
+avg. game turns = 5.00, std. of game turns = 1.58
+avg. game score = 1.75, std. of game score = 4.00
+
+ordered given clues by mean of pos cossim, instead of max as in previous tests. did terribly

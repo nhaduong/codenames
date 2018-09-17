@@ -1,0 +1,12 @@
+name: test7
+Giver embedding: data/googlenews_SLIM.txt, Guesser embedding: data/glove.6B.300d.word2vec.txt
+runtime: 2:22:20.141946
+time finished: 2018-08-23 19:37:59.613333
+# of games played: 89
+# of games won (by team1) = 69
+% of Team 2: Winner: 0.40
+% of Team 1: Winner: 0.30
+% of All clues given were illegal.: 0.17
+% of Assassin word guessed: 0.12
+avg. game turns = 5.30, std. of game turns = 1.58
+avg. game score = 3.10, std. of game score = 3.49

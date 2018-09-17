@@ -14,6 +14,7 @@ import torch
 
 from codenames.clue_givers.giver import Giver, Clue
 from codenames.clue_givers.heuristic_giver import HeuristicGiver
+from codenames.clue_givers.learned_giver import LearnedGiver
 from codenames.clue_givers.wordnet_cluegiver import WordnetClueGiver
 from codenames.embedding_handler import EmbeddingHandler
 from codenames.guessers.guesser import Guesser
@@ -280,11 +281,13 @@ def main(args):
     guesser_embedding_handler = EmbeddingHandler(args.guesser_embeddings_file)
     giver_embedding_handler = EmbeddingHandler(args.giver_embeddings_file)
     if args.giver_type == "heuristic":
-        giver = HeuristicGiver(giver_embedding_handler)
+        giver = HeuristicGiver(giver_embedding_handler, guesser_embedding_handler)
     elif args.giver_type == "random":
         giver = RandomGiver(giver_embedding_handler)
     elif args.giver_type == "wordnet":
         giver = WordnetClueGiver()
+    elif args.giver_type == "learned":
+        giver = LearnedGiver(giver_embedding_handler, guesser_embedding_handler)
     else:
         raise NotImplementedError
 
@@ -301,6 +304,7 @@ def main(args):
                     sys.stdout.write('WARNING: skipping game data |||{}||| due to a conflict with the specified board size: {}'.format(line, args.board_size))
                 continue
             all_game_data.append(line.strip())
+            #all_game_data = all_game_data[:args.num_games]
     else:
         # If game data were not specified, we'd like to generate (args.num_games) random 
         # games. The method `play_game` randomly samples words when the provided game data
@@ -382,6 +386,7 @@ def main(args):
 
     with open(args.experiment_name + '.experiment', mode='wt') as experiment_results_file:
         experiment_results_file.write('name: {}\n'.format(args.experiment_name))
+        experiment_results_file.write('Giver embedding: {}, Guesser embedding: {}\n'.format(args.giver_embeddings_file, args.guesser_embeddings_file))
         experiment_results_file.write('runtime: {}\n'.format(str(datetime.datetime.now() - start_time)))
         experiment_results_file.write('time finished: {}\n'.format(str(datetime.datetime.now())))
         experiment_results_file.write("# of games played: {}\n".format(len(all_scores)))
@@ -400,9 +405,9 @@ if __name__ == "__main__":
     argparser.add_argument("--num-games", type=int, help="Number of games to play")
     argparser.add_argument("--game-data", type=str, default="data/codenames_dev.games")
     argparser.add_argument("--guesser-embeddings-file", type=str, dest="guesser_embeddings_file",
-                           default="data/uk_embeddings.txt")
+                           default="data/test_glove.txt")
     argparser.add_argument("--giver-embeddings-file", type=str, dest="giver_embeddings_file",
-                           default="data/uk_embeddings.txt")
+                           default="data/googlenews_SLIM.txt")
     argparser.add_argument("--load-model", dest="load_model", default=None,
                            help="Will not train if this argument is set.")
     argparser.add_argument("--experiment-name", type=str, default="debug")
