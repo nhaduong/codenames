@@ -158,3 +158,6 @@ class EmbeddingHandler:
 
     def index_to_word(self, idx):
         return self.model.index2word[idx]
+
+    def get_nearest_word(self, vector):
+        return self.model.similar_by_vector(vector, topn=1)

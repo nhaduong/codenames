@@ -158,7 +158,7 @@ class HeuristicGiver(Giver):
                       game_state: List[int],
                       score: int,):
         if self.current_board != board:
-            self.blacklist = ['dentin']
+            self.blacklist = []
             self.current_board = board
         start = time.time()
         pos_words = [board[idx] for idx, val in enumerate(allIDs) if val == GOOD]
