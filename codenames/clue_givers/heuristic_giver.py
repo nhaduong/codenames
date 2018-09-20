@@ -248,7 +248,7 @@ def main():
     game_state = [UNREVEALED, UNREVEALED, UNREVEALED, UNREVEALED, 2, UNREVEALED, UNREVEALED, 2,UNREVEALED,UNREVEALED,UNREVEALED,2,2,UNREVEALED,UNREVEALED,UNREVEALED,UNREVEALED,UNREVEALED,UNREVEALED,2,UNREVEALED,UNREVEALED,UNREVEALED,2,UNREVEALED]
     score = 3
     cg = hg.get_next_clue(board,allIDs,game_state,score)
-    print(cg[:15])
+    #print(cg[:15])
 
 if __name__ == "__main__":
     main()

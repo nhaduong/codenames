@@ -17,6 +17,9 @@ setup(
     author_email='pradeepd@allenai.org',
     license='Apache',
     packages=find_packages(),
+    package_data = {
+        '': ['*.json']
+    },
     python_requires='>=3.6',
     zip_safe=False
 )

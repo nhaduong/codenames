@@ -30,7 +30,7 @@ SCORE_INCORRECT_GUESS = -1
 SCORE_ASSASSIN_GUESS = -5
 SCORE_CIVILIAN_GUESS = -1
 
-
+print(sys.path)
 class GameWrapper:
 
     def __init__(self, board_size, board_data=None):
