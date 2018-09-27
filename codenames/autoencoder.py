@@ -33,17 +33,23 @@ decoded = Dense(300, activation='softmax')(decoded)
 # this model maps an input to its reconstruction
 autoencoder = Model(input_clue, decoded)
 
+
 # this model maps an input to its encoded representation
 encoder = Model(input_clue, encoded)
 
 # create a placeholder for an encoded (32-dimensional) input
 encoded_input = Input(shape=(encoding_dim,))
 # retrieve the last layer of the autoencoder model
-decoder_layer = autoencoder.layers[-1]
-# create the decoder model
-decoder = Model(encoded_input, decoder_layer(encoded_input))
+decoder_layer = autoencoder.layers[-3](encoded_input)
+decoder_layer = autoencoder.layers[-2](decoder_layer)
+decoder_layer = autoencoder.layers[-1](decoder_layer)
 
-autoencoder.compile(optimizer='sgd', loss='binary_crossentropy')
+# create the decoder model
+decoder = Model(encoded_input, decoder_layer)
+
+
+
+autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
 
 x_train = get_word_vectors('D:/Documents/mycodenames/codenames/data/ml/train')
 x_test = get_word_vectors('D:/Documents/mycodenames/codenames/data/ml/test')
@@ -54,6 +60,7 @@ autoencoder.fit(x_train, x_train,
                 shuffle=True,
                 validation_data=(x_test, x_test))
 
+
 # encode and decode some digits
 # note that we take them from the *test* set
 encoded_words = encoder.predict(x_test)
@@ -61,3 +68,5 @@ decoded_words = decoder.predict(encoded_words)
 
 for enc, dec in zip(x_test, decoded_words):
     print(eh.get_nearest_word(enc), eh.get_nearest_word(dec))
+
+autoencoder.save('autoencoder_model_adam.h5')

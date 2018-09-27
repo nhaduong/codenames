@@ -1,13 +1,15 @@
 import operator
 import numpy as np
+import logging
 from itertools import combinations, chain
 from nltk.stem import WordNetLemmatizer as wl
 from nltk.stem.snowball import SnowballStemmer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-from codenames.codenames.embedding_handler import EmbeddingHandler
+from embedding_handler import EmbeddingHandler
 from codenames.codenames.utils.game_utils import Clue, DEFAULT_NUM_CLUES, UNREVEALED, GOOD, BAD, CIVILIAN, ASSASSIN, DEFAULT_NUM_TARGETS, CIVILIAN_PENALTY, ASSASSIN_PENALTY, MULTIGROUP_PENALTY, DEPTH, DEFAULT_NUM_GUESSES
+from codenames.codenames.guessers.heuristic_guesser import HeuristicGuesser
 
 # guesser_embeddings = EmbeddingHandler('D:/Documents/mycodenames/codenames/data/glove.6B.300d.word2vec.txt')
 # giver_embeddings = EmbeddingHandler('D:/Documents/mycodenames/codenames/data/googlenews_SLIM.txt')
@@ -84,17 +86,39 @@ def samp(vocab, length=5):
     board.append(get_clue(board))
     return board
 
-with open('D:\Documents\mycodenames\codenames\codenames\gameplay\words.txt') as v:
-    vocab = v.readlines()
-    vocab = [word.lower().strip('\n') for word in vocab]
-    vocab = [word for word in vocab if guesser_embeddings.get_word_vector(word) is not None and giver_embeddings.get_word_vector(word) is not None]
+def make_data():
+    with open('D:\Documents\mycodenames\codenames\codenames\gameplay\words.txt') as v:
+        vocab = v.readlines()
+        vocab = [word.lower().strip('\n') for word in vocab]
+        vocab = [word for word in vocab if guesser_embeddings.get_word_vector(word) is not None and giver_embeddings.get_word_vector(word) is not None]
 
-    t = ['train', 'dev', 'test']
-    c = [1000, 100, 100]
-    sect = []
-    for a,b in zip(c,t):
-        for i in range(a):
-            with open('D:/Documents/mycodenames/codenames/data/ml/'+str(b), 'a+', encoding='utf-8') as f:
-                f.write(','.join(samp(vocab)) + '\n')
+        t = ['train', 'dev', 'test']
+        c = [100000, 100, 100]
+        sect = []
+        for a,b in zip(c,t):
+            for i in range(a):
+                with open('D:/Documents/mycodenames/codenames/data/ml/'+str(b), 'a+', encoding='utf-8') as f:
+                    f.write(','.join(samp(vocab)) + '\n')
 
+def guess_part(file):
+    with open(file, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+        board_state = [-1] * 5
+        boards = [line.split(',')[:-1] for line in lines]
+        clues = [line.split(',')[-1].strip('\n') for line in lines]
+        # print(lines[:4])
+        # clue_vectors = [eh.get_word_vector(clue) for clue in clues]
+        guesses = []
+        for board, clue in zip(boards, clues):
+            g = HeuristicGuesser.guess(board, clue, 3, board_state, 0)
+            logging.info('board: {}, clue: {}, guesses: {}'.format(board, clue, g))
+            guesses.append(g)
+        for guess_group in guesses:
+            clues_per_guess_group = get_clue(guess_group)
+            logging.info('clue: {}, guess_group: {}'.format(clues_per_guess_group, guess_group))
 
+        with open('first_round', 'a+', encoding='utf-8') as fi:
+            for clue, board in clues_per_guess_group, boards:
+                new_board_and_clue = ','.join(board) + clue + '\n'
+                fi.write(new_board_and_clue)
+guess_part('codenames/data/ml/train')
